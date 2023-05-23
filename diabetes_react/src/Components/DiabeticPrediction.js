@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 
 const DiabeticPrediction = () => {
   const [age, setAge] = useState('');
-  const [gender, setGender] = useState('');
   const [bmi, setBMI] = useState('');
   const [bloodPressure, setBloodPressure] = useState('');
+  const [glucose, setGlucose] = useState('');
   const [insulinLevel, setInsulinLevel] = useState('');
   const [skinThickness, setSkinThickness] = useState('');
   const [pregnancies, setPregnancies] = useState('');
+  const [diabetesPedigreeFunction, setPedigreeFunction] = useState('');
   const [prediction, setPrediction] = useState('');
 
   const handleInputChange = (e) => {
@@ -16,14 +17,17 @@ const DiabeticPrediction = () => {
       case 'age':
         setAge(value);
         break;
-      case 'gender':
-        setGender(value);
-        break;
       case 'bmi':
         setBMI(value);
         break;
       case 'bloodPressure':
         setBloodPressure(value);
+        break;
+      case 'glucose':
+        setGlucose(value);
+        break;
+      case 'diabetesPedigreeFunction':
+        setPedigreeFunction(value);
         break;
       case 'insulinLevel':
         setInsulinLevel(value);
@@ -34,15 +38,34 @@ const DiabeticPrediction = () => {
       case 'pregnancies':
         setPregnancies(value);
         break;
+      case 'prediction':
+        setPrediction(value);
+        break;
       default:
         break;
     }
   };
 
-  const predict = () => {
+  const predict = async() => {
     // TODO: Perform prediction using machine learning algorithms
     // Replace the following code with your actual prediction logic
-    const randomPrediction = Math.random() < 0.5 ? 'Non-Diabetic' : 'Diabetic';
+    let val;
+    const data = {
+      "Pregnancies": pregnancies,
+      "Glucose": glucose,
+      "BloodPressure": bloodPressure,
+      "SkinThickness": skinThickness,
+      "Insulin": insulinLevel,
+      "BMI": bmi,
+      "DiabetesPedigreeFunction": diabetesPedigreeFunction,
+      "Age": age
+    }
+    await fetch('http://localhost:5000/predict', {
+      method: 'post',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+     }).then((res)=> res.text()).then((dat)=>val = JSON.parse(dat).data)
+    const randomPrediction = val == 0 ? 'Non-Diabetic' : 'Diabetic';
     setPrediction(randomPrediction);
   };
 
@@ -60,20 +83,6 @@ const DiabeticPrediction = () => {
           placeholder="Enter age"
           required
         />
-      </div>
-      <div>
-        <label htmlFor="gender">Gender:</label>
-        <select
-          id="gender"
-          name="gender"
-          value={gender}
-          onChange={handleInputChange}
-          required
-        >
-          <option value="">Select gender</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-        </select>
       </div>
       <div>
         <label htmlFor="bmi">BMI:</label>
@@ -97,6 +106,30 @@ const DiabeticPrediction = () => {
           value={bloodPressure}
           onChange={handleInputChange}
           placeholder="Enter blood pressure"
+          required
+        />
+      </div>
+      <div>
+        <label htmlFor="Glucose">Glucose:</label>
+        <input
+          type="number"
+          id="glucose"
+          name="glucose"
+          value={glucose}
+          onChange={handleInputChange}
+          placeholder="Enter Glucose"
+          required
+        />
+      </div>
+      <div>
+        <label htmlFor="Pedigree">Diabetes Pedigree Function:</label>
+        <input
+          type="number"
+          id="diabetesPedigreeFunction"
+          name="diabetesPedigreeFunction"
+          value={diabetesPedigreeFunction}
+          onChange={handleInputChange}
+          placeholder="Enter Diabetes Pedigree Function"
           required
         />
       </div>
